@@ -1,0 +1,36 @@
+.word-goal-status {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.word-goal-label {
+	font-size: 12px;
+	opacity: 0.7;
+	white-space: nowrap;
+}
+
+
+.word-goal-track {
+	width: 80px;
+	height: 8px;
+	background: var(--background-modifier-border);
+	border-radius: 100px;
+	overflow: hidden;
+}
+
+/* Заполняющаяся полоса */
+.word-goal-fill {
+	height: 100%;
+	min-width: 0;
+	border-radius: 999px;
+	background: var(--interactive-accent);
+	transition:
+		width 0.2s ease,
+		background 0.4s ease;
+}
+
+/* Состояние завершения */
+.word-goal-fill--done {
+	background: var(--color-green);
+}
