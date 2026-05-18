@@ -1,7 +1,7 @@
 {
 	"id": "word-progress-bar",
 	"name": "Word Progress Bar",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"minAppVersion": "0.15.0",
 	"description": "Progress bar in the status bar that shows goal of words.",
 	"author": "SomeNoY",

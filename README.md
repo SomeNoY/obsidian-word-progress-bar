@@ -8,11 +8,23 @@ Set a word count goal and watch the bar fill up as you write. When you hit your 
 
 ## Usage
 
-First, go to the settings, set `Words goal for all files` and toggle on `Progress bar for all files`. Open a note and start writing — the bar updates in real time.
+### For all files (default goal)
 
-🎯 Word goals for individual files and customization settings coming soon...
+Toggle on **Use default word goal for all files** in settings and set a **Default word goal**. The progress bar will appear on every note using that goal.
+
+### For specific files (property)
+
+Add a `word-goal` property *(default)* to a note's frontmatter:
+```yaml
+---
+word-goal: 500
+---
+```
+The progress bar will show only on notes that have this property. You can rename the property key in settings (**Frontmatter key for per-file goal**).
 
 ## Installation
+
+Go to Community Plugins and search for **Word Progress Bar**
 
 ### Manual
 

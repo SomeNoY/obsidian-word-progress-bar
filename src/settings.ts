@@ -4,11 +4,13 @@ import WordGoalPlugin from "./main";
 export interface WordGoalSettings {
 	toggleAllFiles: boolean;
 	allFilesGoal: string;
+	frontmatterKey: string;
 }
 
 export const DEFAULT_SETTINGS: WordGoalSettings = {
 	toggleAllFiles: true,
 	allFilesGoal: "100",
+	frontmatterKey: "word-goal",
 };
 
 export class MySettingTab extends PluginSettingTab {
@@ -25,7 +27,8 @@ export class MySettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName("Progress bar for all files")
+			.setName("Use default word goal for all files")
+			.setDesc("When off, the progress bar shows only on notes that have their own goal property")
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.toggleAllFiles)
@@ -39,7 +42,7 @@ export class MySettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Words goal for all files")
+			.setName("Default word goal")
 			.addText((text) =>
 				text
 					.setValue(this.plugin.settings.allFilesGoal)
@@ -56,6 +59,20 @@ export class MySettingTab extends PluginSettingTab {
 						input.value = input.value.replace(/\D/g, "");
 
 						input.value = input.value.replace(/^0+/, "");
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Frontmatter key for per-file goal")
+			.setDesc("If this property exists in a note's frontmatter, its value is used as the word goal for that file")
+			.addText((text) =>
+				text
+					.setValue(this.plugin.settings.frontmatterKey)
+					.onChange(async (value) => {
+						if (value.length > 0) {
+							this.plugin.settings.frontmatterKey = value;
+							await this.plugin.saveSettings();
+						}
 					}),
 			);
 	}

@@ -1,11 +1,11 @@
-import { Plugin, MarkdownView } from "obsidian";
+import { Plugin, MarkdownView, TFile } from "obsidian";
 import { DEFAULT_SETTINGS, WordGoalSettings, MySettingTab } from "./settings";
-import { ProgressBar } from "pb";
+import { ProgressBar } from "./pb";
 
 export default class WordGoalPlugin extends Plugin {
-	settings: WordGoalSettings;
+	settings!: WordGoalSettings;
 
-	private pb: ProgressBar;
+	private pb!: ProgressBar;
 
 	// Can be not really correct as core plugin
 	private countWords(text: string): number {
@@ -33,7 +33,13 @@ export default class WordGoalPlugin extends Plugin {
 			const view = this.app.workspace.getActiveViewOfType(MarkdownView);
 			const file = this.app.workspace.getActiveFile();
 
-			if (!file || !this.settings.toggleAllFiles) {
+			if (!file) {
+				this.pb.hide();
+				return;
+			}
+
+			const goal = this.getGoalForFile(file, this.settings.toggleAllFiles);
+			if (goal === null) {
 				this.pb.hide();
 				return;
 			}
@@ -43,24 +49,54 @@ export default class WordGoalPlugin extends Plugin {
 			if (view) {
 				this.pb.update(
 					this.countWords(view.editor.getValue()),
-					parseInt(this.settings.allFilesGoal),
+					goal,
 				);
 			}
 		});
 
 		this.app.workspace.on("editor-change", (editor) => {
-			if (!this.settings.toggleAllFiles) {
+			const file = this.app.workspace.getActiveFile();
+			if (!file) {
 				this.pb.hide();
 				return;
-			} else {
-				this.pb.show();
 			}
+
+			const goal = this.getGoalForFile(file, this.settings.toggleAllFiles);
+			if (goal === null) {
+				this.pb.hide();
+				return;
+			}
+
+			this.pb.show();
 
 			this.pb.update(
 				this.countWords(editor.getValue()),
-				parseInt(this.settings.allFilesGoal),
+				goal,
 			);
 		});
+	}
+
+	private getGoalForFile(file: TFile, useDefault: boolean): number | null {
+		const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
+		const fileGoal: unknown = frontmatter?.[this.settings.frontmatterKey];
+
+		if (typeof fileGoal === "number" && fileGoal > 0) {
+			return fileGoal;
+		}
+
+		if (typeof fileGoal === "string") {
+			const n = parseInt(fileGoal);
+			if (!isNaN(n) && n > 0) return n;
+		}
+
+		if (!useDefault) return null;
+
+		const globalGoal = parseInt(this.settings.allFilesGoal);
+		if (!isNaN(globalGoal) && globalGoal > 0) {
+			return globalGoal;
+		}
+
+		return null;
 	}
 
 	onunload() {}
